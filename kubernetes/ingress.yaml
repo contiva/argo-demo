@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: todo-app
+  namespace: demo
+  # TLS terminated at Cloudflare
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: demo.contiva.cloud
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: todo-app
+                port:
+                  number: 3000
