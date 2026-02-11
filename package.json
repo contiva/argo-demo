@@ -1,0 +1,14 @@
+{
+  "name": "argo-demo",
+  "version": "1.0.0",
+  "description": "ArgoCD Demo: ToDo App with PostgreSQL",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "pg": "^8.13.1"
+  }
+}
