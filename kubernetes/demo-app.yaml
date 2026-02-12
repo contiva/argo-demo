@@ -3,8 +3,6 @@ kind: Deployment
 metadata:
   name: todo-app
   namespace: demo
-  annotations:
-    webhook-test: "triggered"
   labels:
     app: todo-app
 spec:
