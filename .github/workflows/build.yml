@@ -3,33 +3,32 @@ name: Build and Push
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'kubernetes/**'
 
 env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: contiva/argo-demo
+  IMAGE_NAME: demo/argo-demo
 
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
-      packages: write
+      contents: write
 
     steps:
       - uses: actions/checkout@v4
 
       - uses: docker/login-action@v3
         with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: ${{ secrets.HARBOR_REGISTRY }}
+          username: ${{ secrets.HARBOR_USERNAME }}
+          password: ${{ secrets.HARBOR_PASSWORD }}
 
       - uses: docker/metadata-action@v5
         id: meta
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ secrets.HARBOR_REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=raw,value=latest
             type=sha,prefix=
 
       - uses: docker/build-push-action@v6
@@ -38,3 +37,15 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Update Kubernetes manifest
+        run: |
+          SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          sed -i "s|image: .*argo-demo:.*|image: ${{ secrets.HARBOR_REGISTRY }}/${IMAGE_NAME}:${SHA}|" kubernetes/demo-app.yaml
+
+      - name: Commit and push manifest update
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add kubernetes/demo-app.yaml
+          git diff --staged --quiet && echo "No changes" || git commit -m "deploy: update image tag to ${GITHUB_SHA::7}" && git push

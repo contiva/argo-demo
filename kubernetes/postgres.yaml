@@ -19,6 +19,42 @@ spec:
       remoteRef:
         key: demo-database-url
 ---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: harbor-pull-secret
+  namespace: demo
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: azure-kv
+    kind: ClusterSecretStore
+  target:
+    name: harbor-pull-secret
+    creationPolicy: Owner
+    template:
+      type: kubernetes.io/dockerconfigjson
+      engineVersion: v2
+      mergePolicy: Replace
+      data:
+        .dockerconfigjson: |
+          {
+            "auths": {
+              "registry.contiva.cloud": {
+                "username": "{{ .username }}",
+                "password": "{{ .password }}",
+                "auth": "{{ printf "%s:%s" .username .password | b64enc }}"
+              }
+            }
+          }
+  data:
+    - secretKey: username
+      remoteRef:
+        key: harbor-robot-github-username
+    - secretKey: password
+      remoteRef:
+        key: harbor-robot-github-password
+---
 apiVersion: v1
 kind: Service
 metadata:

@@ -16,10 +16,11 @@ spec:
         app: todo-app
     spec:
       imagePullSecrets:
-        - name: ghcr-secret
+        - name: harbor-pull-secret
       containers:
         - name: todo-app
-          image: ghcr.io/contiva/argo-demo:latest
+          image: registry.contiva.cloud/demo/argo-demo:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 3000
           env:
