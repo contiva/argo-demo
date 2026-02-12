@@ -1,12 +1,20 @@
-apiVersion: v1
-kind: Secret
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
 metadata:
   name: postgres-credentials
   namespace: demo
-type: Opaque
-data:
-  # "demopgpass2024" base64-encoded
-  POSTGRES_PASSWORD: ZGVtb3BncGFzczIwMjQ=
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: azure-kv
+    kind: ClusterSecretStore
+  target:
+    name: postgres-credentials
+    creationPolicy: Owner
+  data:
+    - secretKey: POSTGRES_PASSWORD
+      remoteRef:
+        key: demo-postgres-password
 ---
 apiVersion: v1
 kind: Service
