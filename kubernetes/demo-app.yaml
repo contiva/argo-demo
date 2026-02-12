@@ -24,7 +24,10 @@ spec:
             - containerPort: 3000
           env:
             - name: DATABASE_URL
-              value: postgres://demo:demopgpass2024@postgres:5432/demo?sslmode=disable
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: DATABASE_URL
           resources:
             requests:
               cpu: 50m
