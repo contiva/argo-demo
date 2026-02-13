@@ -22,7 +22,9 @@
     .btn { background: none; border: 1px solid #ddd; border-radius: 4px; padding: .3rem .6rem; cursor: pointer; font-size: .8rem; color: #555; }
     .btn:hover { background: #f0f0f0; }
     .btn-delete:hover { background: #fee; border-color: #e88; color: #c33; }
+    .todo-checkbox { width: 18px; height: 18px; cursor: pointer; accent-color: #0070f3; }
     .empty { text-align: center; color: #999; padding: 2rem; }
+    .limit-hint { text-align: center; color: #c33; background: #fee; padding: .75rem; border-radius: 6px; margin-bottom: 1.5rem; font-size: .9rem; }
     footer { text-align: center; margin-top: 2rem; font-size: .8rem; color: #aaa; }
   </style>
 </head>
@@ -30,10 +32,14 @@
   <div class="container">
     <h1>ToDo <span>contiva.cloud</span></h1>
 
-    <form class="add-form" method="POST" action="/todos">
-      <input type="text" name="title" placeholder="Neue Aufgabe..." autofocus>
-      <button type="submit">Hinzufuegen</button>
-    </form>
+    <% if (todos.length >= 10) { %>
+      <p class="limit-hint">Maximale Anzahl von 10 Aufgaben erreicht.</p>
+    <% } else { %>
+      <form class="add-form" method="POST" action="/todos">
+        <input type="text" name="title" placeholder="Neue Aufgabe..." autofocus>
+        <button type="submit">Hinzufuegen</button>
+      </form>
+    <% } %>
 
     <% if (todos.length === 0) { %>
       <p class="empty">Keine Aufgaben vorhanden.</p>
@@ -42,7 +48,7 @@
         <% todos.forEach(todo => { %>
           <li class="todo-item<%= todo.done ? ' done' : '' %>">
             <form method="POST" action="/todos/<%= todo.id %>/toggle" style="display:inline">
-              <button class="btn" type="submit"><%= todo.done ? '&#10003;' : '&#9675;' %></button>
+              <input type="checkbox" class="todo-checkbox" <%= todo.done ? 'checked' : '' %> onchange="this.form.submit()">
             </form>
             <span class="todo-title"><%= todo.title %></span>
             <form method="POST" action="/todos/<%= todo.id %>/delete" style="display:inline">

@@ -39,6 +39,10 @@ app.get('/', async (req, res) => {
 app.post('/todos', async (req, res) => {
   const { title } = req.body;
   if (title && title.trim()) {
+    const { rows } = await pool.query('SELECT COUNT(*)::int AS count FROM todos');
+    if (rows[0].count >= 10) {
+      return res.redirect('/');
+    }
     await pool.query('INSERT INTO todos (title) VALUES ($1)', [title.trim()]);
   }
   res.redirect('/');
