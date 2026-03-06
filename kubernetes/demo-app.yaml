@@ -14,6 +14,8 @@ spec:
     metadata:
       labels:
         app: todo-app
+      annotations:
+        reloader.stakater.com/auto: "true"
     spec:
       imagePullSecrets:
         - name: harbor-pull-secret
