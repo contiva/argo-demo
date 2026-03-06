@@ -3,6 +3,8 @@ kind: Ingress
 metadata:
   name: todo-app
   namespace: demo
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
   # TLS terminated at Cloudflare
 spec:
   ingressClassName: traefik
